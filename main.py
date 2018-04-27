@@ -8,38 +8,6 @@ from PIL import Image
 # clear display
 print('\033[2J', end='')
 
-
-def rotateRight():
-    pass
-
-
-def rotateLeft():
-    pass
-
-
-def mirror():
-    pass
-
-
-def invert():
-    pass
-
-
-def greyscale():
-    pass
-
-
-def lighten():
-    pass
-
-
-def darken():
-    pass
-
-
-def highlightEdge():
-    pass
-
 def loadInput():
     print('\033[2J')
     file = input('Zadejte jméno souboru:\n')
@@ -53,7 +21,7 @@ def loadInput():
 
 def saveOutput(fileData, file, change):
     f = Image.fromarray(fileData, 'RGB')
-    f.save(change + "_" + file + ".png")
+    f.save(change + "_" + file)
 
 flag = 0
 # interface
@@ -62,6 +30,7 @@ print('Program pro upravu obrazku, zadej jmeno souboru, ktery chces upravit: ')
 file, fileData = 'test.png', np.array(Image.open('test.png'))
 
 while True:
+    fileData = np.array(Image.open(file))
     if flag == -1:
         print('Špatný výběr, volte znovu')
     else:
@@ -104,9 +73,26 @@ while True:
             for j in range(len(fileData[0])):
                 fileData[i][j][:] = np.dot(fileData[i][j][:], [0.299, 0.587, 0.114]).sum()
         saveOutput(fileData, file, "greyscale")
-    # elif flag == '7':
-    # elif flag == '8':
-    # elif flag == '9':
+    elif flag == '7':
+        scale = 10
+        while scale > 9 or scale < 0:
+            scale = int(input('Zadej číslo 0-9 (čím větší tím bude světlejší obrázek): '))
+        scale = (scale+1) * 0.08
+        fileData[...] = fileData[...] + (255 - fileData[...]) * scale
+        saveOutput(fileData, file, "lighter")
+    elif flag == '8':
+        scale = 10
+        while scale > 9 or scale < 0:
+            scale = int(input('Zadej číslo 0-9 (čím menší tím bude tmavší obrázek): '))
+        scale = (scale+1) * 0.08
+        fileData[...] = (fileData[...]) * scale
+        saveOutput(fileData, file, "darker")
+    elif flag == '9':
+        fileData[-3:,:] = 255, 255, 5
+        fileData[:3,:] = 255, 255, 5
+        fileData[:,:3] = 255, 255, 5
+        fileData[:,-3:] = 255, 255, 5
+        saveOutput(fileData, file, "edge")
     else:
         flag = -1
     print('\033[2J', end='')
