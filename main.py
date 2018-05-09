@@ -43,8 +43,8 @@ def filter(data, output):
 
 flag = 0
 print('Program pro úpravu obrázku, zadej jméno souboru, ktery chceš upravit: ')
-# file, fileData = loadInput()
-file, fileData = 'test.png', np.array(Image.open('test.png'), dtype=np.float)
+file, fileData = loadInput()
+# file, fileData = 'test.png', np.array(Image.open('test.png'), dtype=np.float)
 #jiri.znamenacek@fit.cvut.cz
 
 while True:
