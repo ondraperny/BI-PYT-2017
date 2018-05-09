@@ -24,10 +24,28 @@ def saveOutput(fileData, file, change):
     pre, po = file.split('.')
     f.save(pre + "_" + change + "." + po )
 
+def filter(data, output):
+    mask = np.array([[-1, -1, -1], [-1,  9, -1], [-1, -1, -1]])
+    # rozměry vstupního obrázku
+    w, h = data.shape     # Pillow a Numpy mají opačné pořadí
+    # aplikace masky
+    for i in range(1, h - 2):
+        for j in range(1, w - 2):
+            output[j, i] = (data[j-1:j+2,i-1:i+2] * mask).sum()
+
+# def filter(fileData, mask, out)
+#     w, h = fileData.shape
+#     filtr = np.array([[-1, -1, -1, -1, -9, -1, -1, -1, -1]])
+#     for i in range(1, h - 2):
+#         for j in range(1, w - 2):
+#             output[j, i] = (fileData[:,:,i][j-1:j+2,i-1:i+2] * filtr).sum()
+
+
 flag = 0
 print('Program pro úpravu obrázku, zadej jméno souboru, ktery chceš upravit: ')
-file, fileData = loadInput()
-# file, fileData = 'test.png', np.array(Image.open('test.png'))
+# file, fileData = loadInput()
+file, fileData = 'test.png', np.array(Image.open('test.png'), dtype=np.float)
+#jiri.znamenacek@fit.cvut.cz
 
 while True:
     fileData = np.array(Image.open(file))
@@ -106,13 +124,16 @@ while True:
         scale = (scale+1) * 0.08
         fileData[...] = (fileData[...]) * scale
         saveOutput(fileData, file, "darker")
-    # yellow edges of image
+    # highlight the edges
     elif flag == '9':
-        fileData[-3:,:] = 255, 255, 5
-        fileData[:3,:] = 255, 255, 5
-        fileData[:,:3] = 255, 255, 5
-        fileData[:,-3:] = 255, 255, 5
-        saveOutput(fileData, file, "edge")
+        i, j, k = fileData.shape
+        out = np.zeros([i-2, j-2, k])
+        for i in range(3):
+            filter(fileData[:,:,i], out[:,:,i])
+        outData = np.clip(out, 0, 255)
+        outData = np.asarray(outData, dtype=np.uint8)
+        outData = Image.fromarray(outData, 'RGB')
+        outData.save('edge_' + file)
     # wrong input prompt user again
     else:
         flag = -1
